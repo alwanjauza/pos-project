@@ -2,6 +2,7 @@ const express = require("express");
 const jwt = require("jsonwebtoken");
 const dotenv = require("dotenv");
 const cors = require("cors");
+const cookieParser = require("cookie-parser");
 const app = express();
 const db = require("./models"); // Import Sequelize models
 
@@ -13,18 +14,27 @@ const productRoutes = require("./routes/productRoutes");
 const salesRoutes = require("./routes/salesRoutes");
 const userRoutes = require("./routes/userRoutes");
 
+// Configure CORS options
+const corsOptions = {
+  origin: "http://localhost:5173", // Replace with your frontend's address
+  methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
+  credentials: true, // Allow credentials (cookies, authorization headers, etc.)
+  allowedHeaders: ["Content-Type", "Authorization"],
+};
+
 // Middleware to parse JSON requests
 app.use(express.json());
-app.use(cors()); // Enable CORS
+app.use(cookieParser()); // Parse cookies
+app.use(cors(corsOptions)); // Enable CORS
 
-// Middleware to authenticate user and set userId, excluding /auth/register and /auth/login
 const authenticateToken = (req, res, next) => {
+  // Skip authentication for these routes
   if (req.path === "/auth/register" || req.path === "/auth/login") {
-    return next(); // Skip authentication for these routes
+    return next();
   }
 
-  const authHeader = req.headers["authorization"];
-  const token = authHeader && authHeader.split(" ")[1]; // Extract token from 'Bearer <token>'
+  // Check for token in cookies
+  const token = req.cookies.token; // Access the token from cookies
 
   if (token) {
     jwt.verify(token, process.env.JWT_SECRET, (err, decoded) => {
