@@ -5,6 +5,7 @@ import CategoryTabs from "./CategoryTabs";
 import MenuCard from "./MenuCard";
 import CartButton from "./CartButton";
 import { fetchCategories, fetchProductsByCategory } from "@/services/api";
+import Loader from "@/components/Loader/Loader";
 
 interface MenuItem {
   id: number;
@@ -12,6 +13,7 @@ interface MenuItem {
   price: number;
   image: string;
   category: string;
+  description: string;
 }
 
 const OrderPage: React.FC = () => {
@@ -54,9 +56,9 @@ const OrderPage: React.FC = () => {
         onSelectCategory={setSelectedCategory}
       />
 
-      <div className='grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-6 mt-4'>
+      <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mt-4 place-self-center'>
         {loading ? (
-          <p>Loading...</p>
+          <Loader />
         ) : (
           menuItems.map((item) => <MenuCard key={item.id} item={item} />)
         )}
